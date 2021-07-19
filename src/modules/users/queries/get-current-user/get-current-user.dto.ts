@@ -1,4 +1,5 @@
 export class GetCurrentUserDto {
-  name: string;
-  email: string;
+  public id: string;
+  public name: string;
+  public email: string;
 }

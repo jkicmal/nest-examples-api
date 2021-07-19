@@ -1,8 +1,8 @@
-import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
+import { plainToClass } from 'class-transformer';
 import { UsersRepository } from 'src/database/repositories';
 import { GetCurrentUserDto } from './get-current-user.dto';
-import { classToClass } from 'class-transformer';
 
 export class GetCurrentUserQuery {
   constructor(public currentUserId: string) {}
@@ -16,14 +16,13 @@ export class GetCurrentUserQueryHandler
     @InjectRepository(UsersRepository) private usersRepository: UsersRepository,
   ) {}
 
-  async execute(query: GetCurrentUserQuery): Promise<GetCurrentUserDto> {
-    const user = await this.usersRepository
-      .createQueryBuilder('user')
-      .select('user.id')
-      .addSelect('user.email')
-      .addSelect('user.name')
-      .getOne();
+  async execute(): Promise<GetCurrentUserDto> {
+    const user = await this.usersRepository.createQueryBuilder('user').getOne();
 
-    return user as GetCurrentUserDto;
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    };
   }
 }
