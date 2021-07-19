@@ -1,6 +1,5 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { plainToClass } from 'class-transformer';
 import { UsersRepository } from 'src/database/repositories';
 import { GetCurrentUserDto } from './get-current-user.dto';
 

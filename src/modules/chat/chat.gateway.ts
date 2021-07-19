@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { Logger, UseGuards } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -9,7 +9,12 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Socket, Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
+import { WsCurrentUser } from 'src/shared/decorators/ws-current-user.decorator';
+import { CurrentUserPayload } from 'src/shared/interfaces/current-user-payload.interface';
+import { JwtWsAuthGuard } from '../auth/guards/jwt-ws-auth.guard';
+import { JwtService } from '../auth/services/jwt.service';
+import { LoggerService } from '../logger/logger.service';
 
 export enum ChatGatewayMessages {
   SendMessage = 'send-message',
@@ -36,32 +41,30 @@ interface SendMessageDto {
 }
 
 @WebSocketGateway({ namespace: 'chat' })
-export class ChatGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private logger = new Logger('ChatGateway');
+
+  constructor(private loggerService: LoggerService) {}
 
   @WebSocketServer()
   public server: Server;
-
-  afterInit() {
-    this.logger.log('Socket Initialized');
-  }
 
   handleDisconnect() {
     this.logger.log('Client Disconnected');
   }
 
-  handleConnection() {
-    this.logger.log('Client Connected');
+  async handleConnection(@ConnectedSocket() client: Socket) {
+    this.loggerService.log('Client Connected', this);
   }
 
   @SubscribeMessage(ChatGatewayMessages.SendMessage)
+  @UseGuards(JwtWsAuthGuard)
   handleSendMessage(
     @MessageBody() body: SendMessageDto,
     @ConnectedSocket() client: Socket,
+    @WsCurrentUser() currentUser: CurrentUserPayload,
   ) {
-    console.log(client.rooms);
+    console.log(currentUser);
     if (client.rooms.has(body.room)) {
       this.server.to(body.room).emit(ChatGatewayMessages.MessageSent, body);
       this.logger.log('Message Sent');

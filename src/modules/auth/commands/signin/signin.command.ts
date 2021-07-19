@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from 'src/config/config.service';
 import { UsersRepository } from 'src/database/repositories';
 import { compare } from 'src/shared/helpers/auth.helper';
-import { IJwtPayload } from 'src/shared/interfaces/jwt-payload.interface';
+import { CurrentUserPayload as UserJwtPayload } from 'src/shared/interfaces/current-user-payload.interface';
 import jwt from 'src/shared/libs/jwt.lib';
 import { JwtTokenDto } from './jwt-token.dto';
 import { SigninDto } from './signin.dto';
@@ -30,7 +30,7 @@ export class SigninCommandHandler implements ICommandHandler<SigninCommand> {
 
     if (!passwordsMatch) throw new BadRequestException('Cannot authenticate.');
 
-    const payload: IJwtPayload = {
+    const payload: UserJwtPayload = {
       id: user.id,
       email: user.email,
       name: user.name,

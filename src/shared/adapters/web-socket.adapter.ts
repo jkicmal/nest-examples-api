@@ -6,7 +6,10 @@ import { ServerOptions } from 'socket.io';
  */
 export class WebSocketAdapter extends IoAdapter {
   createIOServer(port: number, options?: ServerOptions) {
-    const server = super.createIOServer(port, { ...options, cors: true });
+    const server = super.createIOServer(port, {
+      ...options,
+      cors: true,
+    });
     return server;
   }
 }

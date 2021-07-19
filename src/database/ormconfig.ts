@@ -8,7 +8,7 @@ import { join as joinPath } from 'path';
 import 'src/shared/libs/dotenv.lib';
 
 /**
- * This ConnectionOptions conaints additional 'seeds' and 'factories' props
+ * This ConnectionOptions contain additional 'seeds' and 'factories' props
  */
 import { ConnectionOptions } from 'typeorm-seeding';
 
